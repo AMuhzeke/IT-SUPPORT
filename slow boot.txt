@@ -1,0 +1,81 @@
+slow boot
+
+When Command Prompt is loaded, type this command:
+chkdsk C: /r
+Where C: is the letter of the drive where your Windows Vista or Windows 7 is installed.
+
+Press Enter
+Type:
+sfc /scannow
+Press Enter
+Type:
+exit
+Press Enter
+Restart your computer
+
+
+
+
+Fix #2: Disable startup applications
+If the slow booting is caused by a startup software application or service, you can troubleshoot the exact application causing this by disabling each application with the help of the msconfig utility.
+
+If, after removing/disabling a specific software application, your computer begins to boot correctly and not slow as it was, the issue can be from that software application. Try to update it to the latest available version.
+
+To run msconfig, follow these steps:
+
+Boot into your system
+Click Start
+Click Run
+Type:
+msconfig
+Press Enter or click OK
+Go to the Startup or Services tab
+Disable all services listed in this tab
+Click OK
+Click Restart
+Restart the computer
+
+
+
+
+Fix #3: Delete temporary files
+For more information how to delete temporary files, read this guide.
+
+Large volumes of temporary files (stored in the specific %temp% folder on Windows) may slow down your computer, including the booting process.
+
+To delete the temporary files on your computer, follow these steps:
+
+Start your computer
+Click Start
+Click Run
+Type:
+%temp%
+Press Enter or click OK
+Go to Folder Options (Tools > Folder Options for Windows XP; Organize or Tools > Folder Options for Windows Vista or 7)
+Go to View
+At the Hidden files and folders section, check the Show hidden files, folders, or drive checkbox
+Click OK
+Select all files and folders from the Temporary folder
+Right-click and click Delete
+Click Yes to confirm the deletion of these files and folders
+
+
+
+Fix #4: Defragment HDD
+Having a fragmented hard-disk might slow your computer and how it boots.
+
+Using the Disk Defragmenter utility from Windows, you can rearrange the fragmentation of your hard-disk to make it run more efficiently.
+
+To defragment your hard-disk, follow these steps:
+
+Start your computer and boot into Windows
+Click Start
+Search for Disk Defragmenter
+At the Current Status section, select the disk you want to defragment. If you have multiple disks listed, defragment all disks.
+Click Defragment disk
+
+
+
+
+
+
