@@ -1,0 +1,30 @@
+gpresult
+• Verify policy settings for a computer or user
+• gpresult /r
+• gpresult /user sgc/professor /v
+
+
+sfc /scannow
+
+
+ipconfig
+
+
+map drive
+
+net use h: \\<servername>\<sharename>
+
+ping
+
+ping 127.0.0.1
+
+
+regedit
+
+services.msc
+
+
+• net use x: \\sg-server\mission-reports
+
+window + r
+outlook.exe /safe 
