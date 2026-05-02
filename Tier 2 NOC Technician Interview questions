@@ -1,0 +1,69 @@
+General Questions:
+1. Can you walk me through your experience in IT and network operations?
+"I have over five years of experience in IT support and network operations. My background includes working in a help desk environment, troubleshooting network and system issues, and monitoring network performance in enterprise environments. I have hands-on experience with Linux administration, AWS cloud infrastructure, and network monitoring tools like SolarWinds. In my previous roles, I worked on ticketing systems such as ServiceNow, resolving Tier 1 and Tier 2 issues, ensuring uptime, and assisting with system patching and automation tasks."
+2. Why are you interested in this role at Peraton?
+"I am passionate about working in mission-critical environments, and Peraton’s role in national security and IT transformation aligns with my career goals. The opportunity to work in a 24/7 NOC environment, leveraging my networking, cloud, and Linux skills to support DHS operations, excites me. Additionally, Peraton’s focus on innovation and cybersecurity is a perfect match for my interests in securing IT infrastructure."
+3. What do you know about Peraton and its mission?
+"Peraton is a leading national security company that provides cutting-edge IT solutions to government agencies, including DHS and the U.S. military. The company focuses on cybersecurity, cloud optimization, and mission-critical IT operations, ensuring secure and efficient network operations across multiple domains, from cyberspace to space. I admire Peraton’s role in supporting national security and technological advancement."
+
+Technical Questions:
+4. Can you explain your experience with network monitoring tools like SolarWinds or Nagios?
+"I have used SolarWinds for network performance monitoring, alert management, and identifying bottlenecks in enterprise networks. I am familiar with setting up SNMP monitoring, creating dashboards for real-time network performance analysis, and troubleshooting connectivity issues using logs and reports. I also have experience using Nagios for server health monitoring, log management, and uptime analysis."
+5. How would you troubleshoot a network connectivity issue affecting multiple users?
+"I would follow a structured approach:
+	• Check Monitoring Tools: Use SolarWinds or Splunk to check for alerts or unusual traffic patterns.
+	• Verify Network Devices: Ensure that switches, routers, and firewalls are operational by reviewing logs and running diagnostic commands.
+	• Test Network Path: Use ping, traceroute, and nslookup to check connectivity and identify where the failure occurs.
+	• Check VLANs & Subnets: Ensure that users are assigned the correct VLANs and that DHCP is providing valid IP addresses.
+	• Escalate if Necessary: If the issue involves deeper infrastructure problems, escalate to the appropriate team while keeping stakeholders informed."
+6. What experience do you have with AWS and cloud-based network environments?
+"I have experience managing AWS cloud environments, including provisioning virtual machines, setting up security groups, configuring IAM roles, and monitoring cloud-based network performance. I’ve worked with AWS CloudWatch for real-time logging and have basic experience with AWS GovCloud for secure government-related cloud services."
+7. Have you worked with Red Hat Linux? What administrative tasks have you performed on it?
+"Yes, I have worked extensively with Red Hat Linux. My experience includes user and group management, configuring network interfaces, setting up firewalls with firewalld, performing software installations using yum/dnf, managing log files, and automating tasks using Bash scripting. I have also worked with system patching using Red Hat Satellite."
+8. How do you use Ansible for automation in a NOC environment?
+"I have used Ansible for automating routine administrative tasks, such as deploying software updates, managing configurations, and provisioning servers. I have written Ansible playbooks to automate patching and to configure network devices, improving efficiency and reducing manual errors."
+9. Have you used Red Hat Satellite for provisioning and lifecycle management? If so, how?
+"Yes, I have used Red Hat Satellite to manage system patching, software distribution, and configuration management for Linux environments. I’ve used it to apply security patches in a controlled manner, ensuring compliance across multiple systems."
+10. Can you explain how you’ve used Splunk for monitoring and log analysis?
+"I have used Splunk for analyzing logs, detecting anomalies, and troubleshooting network and system issues. I’ve set up alerts to identify unusual traffic patterns, created dashboards to monitor system performance, and used Splunk queries to search logs for specific error messages."
+11. What’s your experience with ServiceNow or Atlassian JIRA for ticketing and incident management?
+"I have used ServiceNow extensively for tracking incidents, managing service requests, and documenting resolutions. I am familiar with setting priority levels, updating tickets with troubleshooting steps, and escalating issues when necessary. In JIRA, I have worked on tracking project tasks and collaborating with team members to resolve IT-related issues."
+12. How do you ensure network security when performing system patching and compliance activities?
+"I follow best practices by:
+	• Reviewing security bulletins and CVEs before applying patches.
+	• Testing patches in a staging environment before deployment.
+	• Scheduling patching during maintenance windows to minimize downtime.
+	• Using automation tools like Ansible and Red Hat Satellite for controlled patch management.
+	• Ensuring all patches comply with DHS security policies."
+
+Scenario-Based Questions:
+13. You receive an alert that a core network switch is down—what are your immediate steps?
+	• Check monitoring tools for additional alerts.
+	• Attempt to ping the switch and check for connectivity.
+	• Review switch logs to identify errors or hardware failures.
+	• If the issue persists, escalate to the network engineering team while documenting the impact and any troubleshooting steps taken.
+14. A critical system patch needs to be applied, but it could impact network availability. How would you proceed?
+	• Coordinate with stakeholders to schedule a maintenance window.
+	• Test the patch in a staging environment first.
+	• Implement a rollback plan in case issues arise.
+	• Apply the patch and monitor system performance post-installation.
+15. An end-user reports slow network performance—how do you diagnose and resolve the issue?
+	• Check network monitoring tools for bandwidth spikes.
+	• Run ping and traceroute to detect latency.
+	• Check firewall rules for traffic blocks.
+	• Analyze Splunk logs for potential issues.
+	• Engage the network team if hardware-related issues are suspected.
+
+Behavioral Questions:
+16. How do you stay up to date with networking and cybersecurity trends?
+"I regularly follow cybersecurity and IT blogs, participate in online training (TryHackMe, Coursera), and attend webinars. I also practice hands-on skills in my home lab."
+17. Tell me about a time you worked in a high-pressure environment. How did you handle it?
+"During a major outage, I had to troubleshoot a critical network failure under tight deadlines. I remained calm, followed structured troubleshooting steps, communicated regularly with stakeholders, and worked with my team to restore services efficiently."
+18. Have you worked in a remote or telework environment before?
+"Yes, I have worked in a remote NOC role. I ensure productivity by setting up a distraction-free workspace, maintaining clear communication with my team, and using collaboration tools effectively."
+
+Clearance & Compliance Questions:
+19. This role requires a DHS Entry on Duty (EOD) clearance. Are you eligible and willing to go through this process?
+"Yes, I am eligible and willing to obtain the required clearance."
+20. How do you handle sensitive or classified information in a government IT environment?
+"I strictly follow security policies, ensure encryption for sensitive data, and comply with access control regulations. I avoid unauthorized disclosures and adhere to need-to-know principles."
