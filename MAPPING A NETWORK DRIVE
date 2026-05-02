@@ -1,0 +1,5 @@
+1. Start Menu > File Explorer
+2. Right click "This PC" > Map network drive
+3. On the "Drive:" drop down, choose G:
+4. In the "Folder:" field, type \\example01\gsd$
+5. Click Finish
