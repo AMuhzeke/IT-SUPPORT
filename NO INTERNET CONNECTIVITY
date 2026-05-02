@@ -1,0 +1,16 @@
+Use Windows Network Troubleshooter
+airplane mode on/off
+HAD USER TOGGLE WIFI OFF
+Flush Your Domain Name System (DNS).
+ipconfig /flushdns [Enter].
+ipconfig /release [Enter].
+ipconfig /renew [Enter].
+Reset/Reboot Your Modem or Router.
+Settings app
+Click the Wi-Fi button from the bottom-right corner of the taskbar.
+Click Network & Internet settings.
+Choose Wi-Fi on the left panel and click Manage Wi-Fi settings.
+Under Manage known networks, click the network you want to delete.
+Click Forget. The wireless network profile is deleted.
+Repeat for the remaining Stanford wireless networks.
+REBOOT
