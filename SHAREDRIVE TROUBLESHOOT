@@ -1,0 +1,11 @@
+1) Right click on Start menu -> run -> type cmd ->  type GPUPDATE /FORCE  
+When it finishes restart the computer.  This usually fixes the issue.
+ 
+2) remapping the share drive usually fixes the issue.
+(right click on start -> open file explorer -> double click on 'This PC' -> Click on Computer -> map network drive - > Folder: -> Finish
+ 
+3) Right click on start menu -> run -> type services.msc and press enter
+    when you are in the services window
+    scroll down until you see Workstation.
+    Make sure the status is 'running' and startup type should be 'Automatic'
+    Even if it's already running,  you can right click and restart the service and it will fix the issue.
