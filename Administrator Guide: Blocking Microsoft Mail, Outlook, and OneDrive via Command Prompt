@@ -1,0 +1,87 @@
+Administrator Guide: Blocking Microsoft Mail, Outlook, and OneDrive via Command Prompt
+Overview & Scope
+This guide outlines administrative procedures to disable or block Microsoft Mail, Outlook, and Microsoft OneDrive on Windows 10 and Windows 11 workstations using the Windows Command Prompt (cmd.exe). These methods are specifically designed for standalone, non-domain, and small-office environments where administrators need to restrict end-user access to built-in communication and cloud synchronization tools without removing core system packages or requiring complex Active Directory Group Policy infrastructures. Always test this out on one device or a virtual computer first before setting up on other computers.
+Blocking Microsoft Mail and Outlook (Without Uninstalling)
+When administrators need to retain application files on disk while completely preventing users from launching or configuring email accounts, execution restriction policies are the recommended approach.
+Method A: System-Wide Execution Redirection (IFEO) 
+Image File Execution Options (IFEO) redirect binary execution to a benign process (such as systray.exe), causing the application to close instantly without launching its GUI or background sync engines. To apply this configuration, launch Command Prompt as Administrator and execute the corresponding commands:
+
+Execution Block Commands:
+Block New Outlook (olk.exe):
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\olk.exe" /v Debugger /t REG_SZ /d "systray.exe" /f
+
+Block Legacy Windows Mail (HxMail.exe):
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\HxMail.exe" /v Debugger /t REG_SZ /d "systray.exe" /f
+
+
+
+Block Legacy Windows Calendar (HxCalendarAppImm.exe):
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\HxCalendarAppImm.exe" /v Debugger /t REG_SZ /d "systray.exe" /f
+
+Block Classic Desktop Outlook (OUTLOOK.EXE):
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\OUTLOOK.EXE" /v Debugger /t REG_SZ /d "systray.exe" /f
+
+Reversal / Unblock Commands:
+reg delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\olk.exe" /f
+reg delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\HxMail.exe" /f
+reg delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\HxCalendarAppImm.exe" /f
+reg delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\OUTLOOK.EXE" /f
+Method B: Explorer DisallowRun Policy (Access Denied Notice)
+If you prefer end users to receive an explicit administrative warning ("This operation has been cancelled due to restrictions in effect on this computer"), apply the DisallowRun policy via the Registry.
+Enforce Disallowed Application List:
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v DisallowRun /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer\DisallowRun" /v 1 /t REG_SZ /d "olk.exe" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer\DisallowRun" /v 2 /t REG_SZ /d "HxMail.exe" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer\DisallowRun" /v 3 /t REG_SZ /d "HxCalendarAppImm.exe" /f
+
+Reversal / Unblock:
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v DisallowRun /t REG_DWORD /d 0 /f
+
+
+Method C: Complete AppX Removal (Alternative Option)
+If a clean removal of the AppX packages is required instead of an execution block, execute these PowerShell wrapper commands from an elevated Command Prompt:
+
+ 
+
+Blocking OneDrive on Standalone Workstations
+In a non-domain workstation setup, OneDrive can be completely neutralized without uninstalling by combining policy suppression, process termination, UI cleanup, and execution locking.
+Step 1: Enforce Local Policy Block & Terminate Process
+Running the commands below configures the DisableFileSyncNGSC policy (mirroring Group Policy) and immediately stops active background syncing engines:
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\OneDrive" /v DisableFileSyncNGSC /t REG_DWORD /d 1 /f
+taskkill /f /im OneDrive.exe
+Optional — Prevent pre-login network traffic:
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\OneDrive" /v PreventNetworkTrafficPreUserSignIn /t REG_DWORD /d 1 /f
+Step 2: Remove OneDrive from File Explorer Navigation Pane
+To ensure the OneDrive folder does not clutter the left-hand directory tree in File Explorer:
+64-bit Systems (Standard):
+reg add "HKCR\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /v System.IsPinnedToNameSpaceTree /t REG_DWORD /d 0 /f
+32-bit Applications on 64-bit OS (WOW6432Node):
+reg add "HKCR\WOW6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /v System.IsPinnedToNameSpaceTree /t REG_DWORD /d 0 /f
+Step 3: Remove Auto-Start Entry & Hard-Block Binary
+To prevent OneDrive from initiating upon user logon and block direct execution:
+Remove Run on Startup Entry:
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v OneDrive /f
+Hard-Block OneDrive.exe Execution (IFEO):
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\OneDrive.exe" /v Debugger /t REG_SZ /d "systray.exe" /f
+Step 4: Full Restoration / Re-enabling Procedure
+To restore full OneDrive functionality on the workstation at any future point:
+reg delete "HKLM\SOFTWARE\Policies\Microsoft\Windows\OneDrive" /v DisableFileSyncNGSC /f
+reg delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\OneDrive.exe" /f
+reg add "HKCR\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /v System.IsPinnedToNameSpaceTree /t REG_DWORD /d 1 /f
+reg add "HKCR\WOW6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /v System.IsPinnedToNameSpaceTree /t REG_DWORD /d 1 /f
+Administrative Reference Summary
+You go into the registry for this portion of disabling those applications. Before changing the values, double check what you type in for your values. You can easily brick your device, and you do not want that to happen.
+Understanding the Windows Registry and Its Purpose
+The Windows Registry is a centralized, hierarchical database designed to store low-level configuration settings, preferences, and operational parameters for the Microsoft Windows operating system, hardware devices, software applications, and user accounts. It serves as the primary system repository that Windows and third-party software query to retrieve run-time parameters.
+Why the Registry Was Created
+Before the introduction of the Registry, Windows and its applications relied on separate text-based initialization configuration files, primarily .ini files (such as win.ini and system.ini), scattered throughout the operating system. As applications multiplied and operating systems became more sophisticated, this decentralized architecture presented several critical limitations:
+Decentralized Chaos: Different applications managed settings in their own directories, making configuration drift and software management highly chaotic.
+
+Size and Performance Limits: Classic .ini files had a strict size limit of 64KB, which limited complex configurations.
+
+No Multi-User Support: Setting configurations were machine-wide, meaning separate customization, restrictions, or privacy for multiple users logging into the same computer could not be natively sustained.
+
+Lack of Security and Structure: .ini files were simple text documents lacking robust access control permissions, data-type validation, or transactional safety, making them easily corrupted or altered by unauthorized users.
+
+To resolve these architectural weaknesses, Microsoft introduced the Registry in Windows 3.1 and expanded it significantly in Windows 95 and Windows NT. By consolidating configurations into a single system database, Microsoft enabled multi-user profiles, centralized administration (via Group Policies and system tools), transactional integrity, and fine-grained security permissions (Access Control Lists). Today, the Registry acts as the operating system's central nervous system, dictating everything from low-level kernel routines and device driver behaviors to user interfaces and security restrictions.
+ 
