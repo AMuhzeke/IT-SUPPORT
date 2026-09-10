@@ -1,0 +1,22 @@
+Windows 11 computer to automatically empty the Recycle Bin using a feature
+called Storage Sense.
+
+Enable and Configure Storage Sense
+
+1. Open Settings: Press the Windows Key + I to open the Settings app. 
+2. Go to Storage: In the Settings menu, click on System and then
+select Storage. 
+ 
+3. Enable Storage Sense: You will see a toggle switch for Storage Sense. If it&#39;s
+off, click it to turn it on. 
+ 
+4. Configure Cleanup Schedule: Click on Storage Sense to open its
+configuration page. 
+ 
+5. Set Recycle Bin Cleanup: Look for the option that says, &quot;Delete files in my
+recycle bin if they have been there for over&quot; and select your preferred time
+frame from the drop-down menu. You can choose from 1, 14, 30, or 60
+days. 
+ 
+Once you have completed these steps, Windows will automatically delete files
+from your Recycle Bin based on the schedule you have set.
