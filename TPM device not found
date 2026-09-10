@@ -1,0 +1,18 @@
+The "No TPM Device Found" error means your system's motherboard or operating system cannot detect the Trusted Platform Module (TPM) chip, which is required for features like BitLocker, secure boot, and Windows 11 compliance.
+
+Troubleshooting Steps
+
+Step	Action	Description / Details
+
+1. BIOS/UEFI Check	Enable Firmware TPM	Reboot, enter BIOS/UEFI (typically pressing F2, F12, or Del), navigate to Security or Advanced, and ensure TPM / PTT / fTPM is set to Enabled.
+2. Cold Power Reset	Clear Hardware State	Shut down the computer completely, disconnect power (and remove laptop battery if applicable), hold power button for 30 seconds, then reconnect and boot.
+3. Update BIOS/UEFI	Flash Firmware	        Visit the manufacturer's official support page to update the system BIOS/firmware to resolve known detection bugs.
+4. Device Manager	Scan for Hardware Changes	Open devmgmt.msc, expand Security devices, and check if Trusted Platform Module 2.0 is listed or hidden.
+
+Common Pitfalls
+
+Issue	What to Check
+
+Legacy Boot Mode	        TPM 2.0 requires UEFI Mode with Secure Boot enabled, not legacy CSM/BIOS.
+Manufacturer Labels	        Intel systems call firmware TPM PTT (Platform Trust Technology); AMD systems call it fTPM.
+Enterprise / DoD Systems	If this device is provisioned under enterprise IT/DoD policy, TPM settings may be locked by administrative BIOS passwords or require hardware replacement.
