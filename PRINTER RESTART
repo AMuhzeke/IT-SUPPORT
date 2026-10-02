@@ -1,0 +1,8 @@
+command prompt 
+
+In the Command Prompt type: net stop spooler 	
+In the Command Prompt type: net start spooler
+
+After restarting the spooler the applications like Outlook, Excel or Word need to be closes and reopened (rebooted) 
+
+
