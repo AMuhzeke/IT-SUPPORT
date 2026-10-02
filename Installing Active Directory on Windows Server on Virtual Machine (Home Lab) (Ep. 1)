@@ -1,0 +1,14 @@
+Installing Active Directory on Windows Server on Virtual Machine (Home Lab) (Ep. 1)
+
+
+
+
+
+
+
+
+
+
+Hello guys! Here's an updated video of the Active Directory Setup Home Lab that I made 2 years ago. In this video, I will show you the step by step process on how to Install Active Directory on a Windows Server on a VM so you can practice your skills at home. Below are the links for the download files if you are interested in setting it up: VMware Workstation Pro download: https://knowledge.broadcom.com/extern... Windows Server 2022 ISO download: https://www.microsoft.com/en-us/evalc... This is the first video for the series of Home Lab Projects you can do to build your skills so please stay tuned for the next videos if you are interested. Chapters: 00:00 - Introduction 01:26 - Setting up Active Directory 02:19 - Installing VMWare Workstation 03:48 - Windows Server ISO download 04:56 - Creating a new VM 05:59 - Installing Windows Server on VM 06:57 - Windows Server setup 08:59 - Installing Active Directory 12:21 - Basic AD Setup 14:03 - Creating OU 15:48 - Creating Groups Intro 16:28 - Group Scope explanation 17:26 - Group type explanation 22:10 - How to create Groups 23:09 - Creating Users 24:26 - Hands-on Activity 24:44 - Outro
+
+From <https://www.youtube.com/watch?v=GsmJowwIh8Q&list=PLyZUeYK7ols_Dx8AHgdp50ku0u74B8jjy&index=8&t=16s
