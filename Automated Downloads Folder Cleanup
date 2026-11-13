@@ -1,0 +1,151 @@
+================================================================================
+
+STANDARD OPERATING PROCEDURE
+
+Automated Downloads Folder Cleanup
+
+Targeting Standalone Public Workstations | Windows 10/11 Pro & Enterprise
+
+================================================================================
+
+
+
+1. PURPOSE & OVERVIEW
+
+--------------------------------------------------------------------------------
+
+This Standard Operating Procedure (SOP) details the exact steps required to 
+
+automatically purge patron files and subfolders from the Downloads directory 
+
+upon system reboot or user logon. To preserve workstation stability and maintain 
+
+user shell structure, commands target file contents recursively without removing 
+
+system shell folders or corrupting profile environment variables.
+
+
+
+Why This Method is Safe for Public Library PCs:
+
+* Preserves Shell Directories: Clears all subfiles and subfolders within 
+
+  Downloads without deleting the root Downloads folder itself.
+
+* Prevents Profile Corruption: Avoids stripping hidden system attributes or 
+
+  disrupting user profile environment variables.
+
+* Silent Background Execution: Runs completely in the background 
+
+  (-WindowStyle Hidden) without flashing command prompts to patrons.
+
+
+
+
+
+2. TASK SCHEDULER SETUP (RECOMMENDED)
+
+--------------------------------------------------------------------------------
+
+Follow these step-by-step instructions on each standalone library computer to 
+
+schedule automatic folder cleanup.
+
+
+
+[Step 1: Open Tool]
+
+- Press Win + R, type taskschd.msc, and press Enter.
+
+
+
+[Step 2: Create Task]
+
+- In the right-hand Actions panel, click Create Task...
+
+
+
+[Step 3: General Tab]
+
+- Name: Library Downloads Cleanup
+
+- Check: Run with highest privileges (Required for full file access).
+
+
+
+[Step 4: Triggers Tab]
+
+- Click New...
+
+- Set Begin the task to: At startup (or At log on).
+
+- Click OK.
+
+
+
+[Step 5: Actions Tab]
+
+- Click New...
+
+- Action: Start a program
+
+- Program/script: powershell.exe
+
+- Add arguments: See command below in Section 3.
+
+- Click OK.
+
+
+
+[Step 6: Finalize]
+
+- Click OK to save the task. Test by rebooting the workstation or logging off 
+
+  and back in.
+
+
+
+
+
+3. COMMAND ARGUMENTS FOR STEP 5
+
+--------------------------------------------------------------------------------
+
+In Step 5 of the Task Scheduler setup, enter the following exact string in the 
+
+'Add arguments (optional)' box:
+
+
+
+-NoProfile -NonInteractive -WindowStyle Hidden -Command "Get-ChildItem -Path '$env:USERPROFILE\Downloads' -Recurse -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue"
+
+
+
+
+
+4. OPTIONAL GROUP POLICY (BYPASS RECYCLE BIN)
+
+--------------------------------------------------------------------------------
+
+If you prefer that files deleted manually by patrons instantly bypass the 
+
+Recycle Bin altogether at all times:
+
+
+
+1. Press Win + R, type gpedit.msc, and press Enter.
+
+2. Navigate to: User Configuration > Administrative Templates > Windows Components > File Explorer
+
+3. Double-click policy: "Do not move deleted files to the Recycle Bin"
+
+4. Set to Enabled and click OK.
+
+
+
+Note: If you only want cleanup to happen automatically at startup/logon via 
+
+Task Scheduler, keep this Group Policy set to Not Configured.
+
+================================================================================
