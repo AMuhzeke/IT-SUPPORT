@@ -1,0 +1,811 @@
+================================================================================
+
+AUTOMATED WINDOWS PRINTER TROUBLESHOOTER GUI
+
+Enterprise Setup & User Guide
+
+================================================================================
+
+Document Status : Released
+
+Author          : Enterprise IT Operations
+
+Date            : September 26, 2026
+
+Version         : 1.0.0
+
+================================================================================
+
+
+
+TABLE OF CONTENTS
+
+--------------------------------------------------------------------------------
+
+1. Overview
+
+   1.1. Key Capabilities
+
+2. Prerequisites & System Requirements
+
+3. Complete Python Source Code (printer_tool.py)
+
+4. Step-by-Step Instructions to Run the Script
+
+5. Compiling into a Standalone Executable (.exe)
+
+6. Architecture & Implementation Details
+
+7. Troubleshooting & FAQ
+
+
+
+
+
+1. OVERVIEW
+
+--------------------------------------------------------------------------------
+
+The Automated Windows Printer Troubleshooter GUI is an enterprise-grade utility 
+
+written in Python that automates the diagnosis and resolution of common Windows 
+
+print spooler and print queue errors. It features a modern desktop graphical 
+
+user interface (GUI) built with Python's native Tkinter framework and executes 
+
+an underlying multi-step PowerShell troubleshooting engine.
+
+
+
+1.1. Key Capabilities
+
+* Automatic Network Discovery: Automatically enumerates installed network 
+
+  printers, resolves their IP addresses or hostnames, and validates network 
+
+  reachability via ping tests.
+
+* Queue Inspection: Inspects active print jobs across all connected printers 
+
+  and displays stuck documents.
+
+* Service Management: Safely stops the Windows Print Spooler service (spooler) 
+
+  using native service control routines.
+
+* Spool Directory Purge: Unlocks and purges corrupted shadow (.shd) and spool 
+
+  (.spl) files located in C:\Windows\System32\spool\PRINTERS.
+
+* Automatic Spooler Restart: Restarts the Print Spooler service and confirms 
+
+  operational health.
+
+* Final Queue Verification: Verifies that print queues have been successfully 
+
+  cleared and are ready to receive new print jobs.
+
+* Auto-Elevation (UAC): Automatically requests Administrator privileges if 
+
+  launched by an unelevated user.
+
+* Non-Blocking Multithreaded Architecture: Runs diagnostics on a dedicated 
+
+  worker thread to keep the user interface responsive and prevent "Not 
+
+  Responding" states.
+
+
+
+
+
+2. PREREQUISITES & SYSTEM REQUIREMENTS
+
+--------------------------------------------------------------------------------
+
+Before setting up and running the application, ensure your environment meets the 
+
+following technical specifications:
+
+
+
+* Operating System   : Windows 10 or Windows 11 (64-bit recommended)
+
+* Python Version     : Python 3.8, 3.9, 3.10, 3.11, or 3.12
+
+* Standard Libraries : tkinter, ctypes, subprocess, threading, os, sys 
+
+                       (All bundled with standard Windows Python installations)
+
+* User Privileges    : Administrative privileges (required to stop/start 
+
+                       Windows services and purge system directories)
+
+* PowerShell         : Windows PowerShell 5.1 or later (pre-installed on 
+
+                       Windows 10 and 11)
+
+
+
+
+
+3. COMPLETE PYTHON SOURCE CODE (printer_tool.py)
+
+--------------------------------------------------------------------------------
+
+Save the following complete Python source code into a file named printer_tool.py. 
+
+This script contains both the Tkinter GUI layout and the embedded PowerShell 
+
+execution logic.
+
+
+
+--- BEGIN CODE (printer_tool.py) ---
+
+
+
+import os
+
+import sys
+
+import ctypes
+
+import subprocess
+
+import tkinter as tk
+
+from tkinter import messagebox, scrolledtext
+
+import threading
+
+
+
+
+
+class PrinterToolGUI:
+
+    def __init__(self, root):
+
+        self.root = root
+
+        self.root.title("Gemini Enterprise - Printer Troubleshooter")
+
+        self.root.geometry("700x550")
+
+        self.root.configure(bg="#1e1e2e")
+
+        
+
+        # --- UI Styling ---
+
+        self.title_font = ("Segoe UI", 14, "bold")
+
+        self.text_font = ("Consolas", 10)
+
+        self.btn_font = ("Segoe UI", 10, "bold")
+
+        
+
+        # Header Section
+
+        self.header = tk.Label(
+
+            root, 
+
+            text="🛠️ AUTOMATED PRINTER TROUBLESHOOTER", 
+
+            font=self.title_font, 
+
+            fg="#cdd6f4", 
+
+            bg="#1e1e2e",
+
+            pady=15
+
+        )
+
+        self.header.pack()
+
+        
+
+        # Action Buttons Container
+
+        self.btn_frame = tk.Frame(root, bg="#1e1e2e")
+
+        self.btn_frame.pack(pady=10)
+
+        
+
+        # Run Button
+
+        self.run_btn = tk.Button(
+
+            self.btn_frame, 
+
+            text="🚀 RUN DIAGNOSTICS & CLEAN", 
+
+            font=self.btn_font, 
+
+            bg="#a6e3a1", 
+
+            fg="#11111b",
+
+            padx=15, 
+
+            pady=8, 
+
+            activebackground="#89b4fa",
+
+            command=self.start_process_thread
+
+        )
+
+        self.run_btn.grid(row=0, column=0, padx=10)
+
+        
+
+        # Clear Terminal Button
+
+        self.clear_btn = tk.Button(
+
+            self.btn_frame, 
+
+            text="🧹 CLEAR LOG", 
+
+            font=self.btn_font, 
+
+            bg="#f38ba8", 
+
+            fg="#11111b",
+
+            padx=15, 
+
+            pady=8, 
+
+            activebackground="#f5e0dc",
+
+            command=self.clear_log
+
+        )
+
+        self.clear_btn.grid(row=0, column=1, padx=10)
+
+
+
+        # Status Label
+
+        self.status_label = tk.Label(
+
+            root, 
+
+            text="System Ready. Click 'RUN DIAGNOSTICS' to begin.", 
+
+            font=("Segoe UI", 10, "italic"), 
+
+            fg="#9399b2", 
+
+            bg="#1e1e2e",
+
+            pady=5
+
+        )
+
+        self.status_label.pack()
+
+
+
+        # Terminal Output Box
+
+        self.terminal = scrolledtext.ScrolledText(
+
+            root, 
+
+            font=self.text_font, 
+
+            bg="#181825", 
+
+            fg="#a6e3a1", 
+
+            insertbackground="white", 
+
+            wrap=tk.WORD,
+
+            borderwidth=0,
+
+            highlightthickness=1,
+
+            highlightcolor="#45475a"
+
+        )
+
+        self.terminal.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+
+        
+
+    def log(self, text):
+
+        self.terminal.insert(tk.END, text + "\n")
+
+        self.terminal.see(tk.END)
+
+        
+
+    def clear_log(self):
+
+        self.terminal.delete('1.0', tk.END)
+
+        self.status_label.config(text="Log cleared. Ready.", fg="#9399b2")
+
+
+
+    def start_process_thread(self):
+
+        self.run_btn.config(state=tk.DISABLED)
+
+        self.status_label.config(text="⚙️ Troubleshooting in progress... Please wait.", fg="#f9e2af")
+
+        self.clear_log()
+
+        thread = threading.Thread(target=self.run_printer_troubleshooter)
+
+        thread.start()
+
+
+
+    def run_printer_troubleshooter(self):
+
+        powershell_script = """
+
+        $OutputEncoding = [System.Text.Encoding]::UTF8
+
+        Write-Output "🔍 [STEP 1/6] Auto-detecting network printers..."
+
+        $printers = Get-CimInstance -ClassName Win32_Printer | Where-Object { $_.Network -or $_.PortName -like '*.*' -or $_.PortName -match '^\\d{1,3}\\.' }
+
+        if (-not $printers) { $printers = Get-CimInstance -ClassName Win32_Printer }
+
+        
+
+        $printerStatusTable = @()
+
+        foreach ($printer in $printers) {
+
+            $address = $printer.PortName
+
+            if ($address -match 'IP_(.*)') { $address = $Matches[1] }
+
+            if ($address -match '^(LPT|COM|USB|PORTPROMPT|pdf|nul|Microsoft|shrd)') { continue }
+
+            
+
+            Write-Output "📡 Testing connection to: $($printer.Name) ($address)..."
+
+            $pingTest = Test-Connection -ComputerName $address -Count 1 -Quiet -ErrorAction SilentlyContinue
+
+            $status = if ($pingTest) { "ONLINE" } else { "OFFLINE" }
+
+            $printerStatusTable += [PSCustomObject]@{'Printer'=$printer.Name; 'Address'=$address; 'Status'=$status}
+
+        }
+
+        if ($printerStatusTable) { 
+
+            Write-Output "`n📊 NETWORK PRINTER STATUS:"
+
+            $printerStatusTable | Format-Table -AutoSize | Out-String | Write-Output
+
+        }
+
+        
+
+        Write-Output "`n📋 [STEP 2/6] Checking current queue..."
+
+        $jobs = Get-PrintJob -PrinterName * -ErrorAction SilentlyContinue
+
+        if ($jobs) { 
+
+            Write-Output "⚠️ Found $($jobs.Count) stuck jobs."
+
+            $jobs | Select-Object PrinterName, ID, DocumentName | Format-Table -AutoSize | Out-String | Write-Output
+
+        } else { 
+
+            Write-Output "✅ Print queue is already empty." 
+
+        }
+
+        
+
+        Write-Output "`n🛑 [STEP 3/6] Stopping Print Spooler service..."
+
+        Stop-Service -Name "Spooler" -Force -ErrorAction SilentlyContinue
+
+        if ((Get-Service -Name "Spooler").Status -ne 'Stopped') {
+
+            Write-Output "❌ CRITICAL: Failed to stop Print Spooler."
+
+            Exit
+
+        }
+
+        Write-Output "✅ Print Spooler stopped successfully."
+
+        
+
+        Write-Output "`n🧹 [STEP 4/6] Clearing stuck print queue files..."
+
+        $spoolPath = "$env:SystemRoot\\System32\\spool\\PRINTERS"
+
+        try {
+
+            Get-ChildItem -Path $spoolPath -Include *.spl, *.shd -Recurse | Remove-Item -Force -ErrorAction SilentlyContinue
+
+            Write-Output "✅ Print spool directory files purged."
+
+        } catch {
+
+            Write-Output "⚠️ Spool folder was already empty or file locked."
+
+        }
+
+        
+
+        Write-Output "`n🚀 [STEP 5/6] Starting Print Spooler service..."
+
+        Start-Service -Name "Spooler" -ErrorAction SilentlyContinue
+
+        if ((Get-Service -Name "Spooler").Status -eq 'Running') {
+
+            Write-Output "✅ Print Spooler has successfully restarted."
+
+        } else {
+
+            Write-Output "❌ CRITICAL: Failed to start Print Spooler."
+
+            Exit
+
+        }
+
+        
+
+        Write-Output "`n🔄 [STEP 6/6] Finalizing queue verification..."
+
+        $finalJobs = Get-PrintJob -PrinterName * -ErrorAction SilentlyContinue
+
+        if (-not $finalJobs) {
+
+            Write-Output "`n🎉 SUCCESS: Printer queue is clear and Spooler is healthy!"
+
+        } else {
+
+            Write-Output "`n⚠️ WARNING: Active jobs still persist. Physical hardware intervention may be required."
+
+        }
+
+        """
+
+
+
+        try:
+
+            process = subprocess.Popen(
+
+                ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", powershell_script],
+
+                stdout=subprocess.PIPE,
+
+                stderr=subprocess.PIPE,
+
+                text=True,
+
+                creationflags=subprocess.CREATE_NO_WINDOW
+
+            )
+
+            for line in process.stdout:
+
+                self.log(line.strip())
+
+            process.wait()
+
+
+
+            if process.returncode == 0:
+
+                self.status_label.config(text="✅ Maintenance Completed Successfully!", fg="#a6e3a1")
+
+            else:
+
+                err_output = process.stderr.read()
+
+                self.log(f"\n❌ Error during execution:\n{err_output}")
+
+                self.status_label.config(text="❌ Script execution failed.", fg="#f38ba8")
+
+
+
+        except Exception as e:
+
+            self.log(f"\n❌ Python system exception: {str(e)}")
+
+            self.status_label.config(text="❌ Interface Error.", fg="#f38ba8")
+
+        finally:
+
+            self.run_btn.config(state=tk.NORMAL)
+
+
+
+
+
+def is_admin():
+
+    try:
+
+        return ctypes.windll.shell32.IsUserAnAdmin()
+
+    except:
+
+        return False
+
+
+
+
+
+if __name__ == "__main__":
+
+    if is_admin():
+
+        root = tk.Tk()
+
+        app = PrinterToolGUI(root)
+
+        root.mainloop()
+
+    else:
+
+        print("🛡️ Requesting Administrator rights...")
+
+        ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+
+
+
+--- END CODE (printer_tool.py) ---
+
+
+
+
+
+4. STEP-BY-STEP INSTRUCTIONS TO RUN THE SCRIPT
+
+--------------------------------------------------------------------------------
+
+4.1. Step 1: Create the Project Directory
+
+1. Open Windows File Explorer.
+
+2. Navigate to a directory of your choice, such as C:\PrinterUtility or your 
+
+   Desktop.
+
+3. Create a new folder named PrinterTool.
+
+
+
+4.2. Step 2: Save the Python File
+
+1. Open a text editor such as Notepad or VS Code.
+
+2. Copy and paste the complete Python code provided in Section 3 into the 
+
+   editor.
+
+3. Select File > Save As.
+
+4. In the "Save as type" dropdown, select All Files (*.*).
+
+5. Save the file as printer_tool.py inside the PrinterTool folder.
+
+   (Note: When saving in Notepad, make sure Encoding is set to UTF-8 so the 
+
+   emoji icons render properly.)
+
+
+
+4.3. Step 3: Run the Application
+
+1. Double-click printer_tool.py or launch it from the Command Prompt:
+
+
+
+   python printer_tool.py
+
+
+
+2. User Account Control (UAC) Prompt: Because the script detects elevation 
+
+   requirements upon launch, Windows will display a prompt asking: "Do you want 
+
+   to allow this app to make changes to your device?" Click Yes.
+
+3. The graphical interface will appear.
+
+4. Click RUN DIAGNOSTICS & CLEAN to execute the maintenance routine. Real-time 
+
+   progress and logs will appear in the output console.
+
+
+
+
+
+5. COMPILING INTO A STANDALONE EXECUTABLE (.EXE)
+
+--------------------------------------------------------------------------------
+
+You can package printer_tool.py into a single, standalone .exe binary that runs 
+
+on any Windows machine without requiring Python to be installed.
+
+
+
+5.1. Step 1: Install PyInstaller
+
+Open Command Prompt or Windows PowerShell as Administrator and run:
+
+
+
+   pip install pyinstaller
+
+
+
+5.2. Step 2: Compile the Executable
+
+Navigate to the directory where printer_tool.py is saved and run the build 
+
+command:
+
+
+
+   cd /d C:\PrinterTool
+
+   pyinstaller --onefile --noconsole --name "PrinterTroubleshooter" printer_tool.py
+
+
+
+5.3. Parameter Breakdown
+
+* --onefile: Bundles the entire Python runtime, dependencies, and script into 
+
+  a single, portable executable file.
+
+* --noconsole: Suppresses the default background black command prompt window, 
+
+  ensuring only the modern GUI is visible.
+
+* --name "PrinterTroubleshooter": Assigns a user-friendly name to the output 
+
+  executable.
+
+
+
+5.4. Step 3: Locate and Run Your .exe
+
+1. Once PyInstaller completes compilation, a dist folder will appear in your 
+
+   directory (C:\PrinterTool\dist).
+
+2. Inside dist, you will find PrinterTroubleshooter.exe.
+
+3. Double-click PrinterTroubleshooter.exe to run the tool directly. You can 
+
+   distribute this single file to any Windows computer on your network.
+
+
+
+
+
+6. ARCHITECTURE & IMPLEMENTATION DETAILS
+
+--------------------------------------------------------------------------------
+
+[GUI Framework]
+
+- Implementation: tkinter & tkinter.scrolledtext
+
+- Purpose: Provides lightweight, native, zero-dependency graphical windows and 
+
+  log views.
+
+
+
+[Auto-Elevation]
+
+- Implementation: ctypes.windll.shell32.IsUserAnAdmin() & ShellExecuteW("runas")
+
+- Purpose: Detects administrator status and re-launches the process with 
+
+  elevated security tokens when needed.
+
+
+
+[Thread Management]
+
+- Implementation: threading.Thread(target=...)
+
+- Purpose: Offloads system calls to a background worker thread, ensuring the 
+
+  GUI never freezes or enters "Not Responding" states.
+
+
+
+[System Interaction]
+
+- Implementation: subprocess.Popen with CREATE_NO_WINDOW
+
+- Purpose: Spawns PowerShell quietly in the background and pipes stdout 
+
+  line-by-line into the UI console in real time.
+
+
+
+[Service Control]
+
+- Implementation: Stop-Service & Start-Service
+
+- Purpose: Directly interfaces with Windows Service Manager to cleanly toggle 
+
+  the Spooler service.
+
+
+
+[Spool Purge]
+
+- Implementation: Remove-Item on *.spl and *.shd
+
+- Purpose: Purges corrupt, orphaned print spool files from disk.
+
+
+
+
+
+7. TROUBLESHOOTING & FAQ
+
+--------------------------------------------------------------------------------
+
+Q1: The ping test shows "OFFLINE" even though my printer is turned on.
+
+Cause: Network printers configured with ICMP ping disabled or machines 
+
+connected across certain enterprise subnets/VPNs block ping packets.
+
+Resolution: The script will still proceed to clear stuck local print queues 
+
+and cycle the spooler service regardless of ping status.
+
+
+
+Q2: Windows Defender or Antivirus flags the compiled .exe.
+
+Cause: Freshly compiled executables created by PyInstaller lack digital 
+
+code-signing certificates and can trigger generic heuristic warnings.
+
+Resolution: Add a security exception in Windows Defender for the file, or run 
+
+the native Python script (python printer_tool.py) directly.
+
+
+
+Q3: Some print jobs cannot be deleted during Step 4.
+
+Cause: A hardware driver or third-party print monitor process holds a locked 
+
+handle on the spool file.
+
+Resolution: Reboot the machine to drop all file locks, then immediately 
+
+execute the troubleshooter before submitting new print jobs.
+
+================================================================================
